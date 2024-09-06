@@ -1,4 +1,4 @@
-import type { Interface as ReadLine } from 'readline';
+import { Interface as ReadLine, createInterface } from 'readline';
 import { EventEmitter } from 'events';
 import { ComplexType, List } from './utils.js';
 
@@ -30,9 +30,12 @@ class CLIEvents extends ComplexType {
 export class CLI {
     private readonly windows = new List<CLIElement>();
     private currentWindow: string = '';
+    public readonly readline;
 
-    constructor(startWindow?: CLIWindow) {
+    /* readline is dummy, without a realine the interface is not working*/
+    constructor(startWindow?: CLIWindow, readline?: ReadLine) {
         if (startWindow) this.add(startWindow);
+        this.readline = (readline) ? readline : createInterface(process.stdin, process.stdout);
     }
 
     public static readonly cursor = class Cursor {
@@ -63,7 +66,15 @@ export class CLI {
 
 }
 
-class CLIEventEmitter extends EventEmitter {
+interface CLIEventEmitter {
+    on<K>(eventName: string | symbol, listener: (...args: any[]) => void): EventEmitter;
+    emit<K>(eventName: string | symbol, ...args: any): boolean
+}
+class CLIEventEmitter {
+    private readonly emitter = new EventEmitter();
+    on = this.emitter.on;
+    emit = this.emitter.emit;
+
     reload(): void {
         this.emit(CLIEvents.RELOAD);
     }
@@ -232,13 +243,23 @@ interface MatrixIndex {
     row: number,
     column: number
 }
+class MatrixIndex {
+    constructor() {
+        this.row = 0;
+        this.column = 0
+    }
+
+    toString() {
+        return `${this.row}-${this.column}`;
+    }
+}
 
 export interface CLIChoiceBox extends CLICallbackElement {
     callbackFunction(index?: MatrixIndex): void;
 }
 export class CLIChoiceBox extends CLICallbackElement {
     private menuOptions: string[][];
-    private currentIndex: MatrixIndex = { row: 0, column: 0 };
+    private readonly currentIndex: MatrixIndex = new MatrixIndex();
     private handler = false;
 
     constructor(menuOptions: (string | string[])[], callbackFunction: (index?: MatrixIndex) => void) {

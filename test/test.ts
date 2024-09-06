@@ -1,14 +1,4 @@
-# Easy JS CLI
-
-An easy way to create complex CLI.
-
-# Installation
-
-`npm run build`
-
-# Example
-
-`import { CLI, CLIWindow, CLIText, CLIChoiceBox } from "../src/cli.js";
+import { CLI, CLIWindow, CLIText, CLIChoiceBox } from "../src/cli.js";
 
 const textbox = new CLIText("Choose one");
 const cli: CLI = new CLI()
@@ -46,4 +36,4 @@ cli.add(new CLIWindow(
         ]
     )
 );
-cli.render();`
+cli.render();
