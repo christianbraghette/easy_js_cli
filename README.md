@@ -47,3 +47,5 @@ cli.add(new CLIWindow(
     )
 );
 cli.render();`
+
+![](image.png)
