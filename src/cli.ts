@@ -255,14 +255,14 @@ class MatrixIndex {
 }
 
 export interface CLIChoiceBox extends CLICallbackElement {
-    callbackFunction(index?: MatrixIndex): void;
+    callbackFunction(index?: MatrixIndex, label?: string, options?: string[][]): void;
 }
 export class CLIChoiceBox extends CLICallbackElement {
     private menuOptions: string[][];
     private readonly currentIndex: MatrixIndex = new MatrixIndex();
     private handler = false;
 
-    constructor(menuOptions: (string | string[])[], callbackFunction: (index?: MatrixIndex) => void) {
+    constructor(menuOptions: (string | string[])[], callbackFunction: (index?: MatrixIndex, label?: string, options?: string[][]) => void) {
         super();
         this.menuOptions = [];
         menuOptions.forEach((element, index) => {
@@ -270,11 +270,6 @@ export class CLIChoiceBox extends CLICallbackElement {
             else this.menuOptions[index] = element;
         });
         this.callbackFunction = callbackFunction;
-
-        this.on('keypress', (char: string, key: Key) => {
-            console.log(this.currentIndex);
-
-        })
     }
 
     render(): string {
@@ -315,7 +310,7 @@ export class CLIChoiceBox extends CLICallbackElement {
                 this.currentIndex.column = (this.currentIndex.column + 1) % this.menuOptions[this.currentIndex.row].length;
                 break;
             case 'return':
-                this.callbackFunction(this.currentIndex);
+                this.callbackFunction(this.currentIndex, this.menuOptions[this.currentIndex.row][this.currentIndex.column], this.menuOptions);
                 return;
         }
         this.reload();
